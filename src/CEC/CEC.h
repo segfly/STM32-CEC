@@ -21,6 +21,10 @@ public:
 
 	virtual void Run();
 	virtual bool TransmitFrame(int targetAddress, unsigned char* buffer, int count);
+    
+    void setPhysicalAddress(int physicalAddress) {
+        _physicalAddress = physicalAddress;
+    }
 
 protected:
 	virtual bool IsISRTriggered() = 0;
@@ -67,8 +71,7 @@ private:
 	typedef enum {
 	} CEC_TERTIARY_STATE;
 
-public:
-//protected:
+protected:
 	static int _validLogicalAddresses[6][5];
 	int _logicalAddress;
 	int _physicalAddress;

@@ -34,6 +34,12 @@ void CEC_LogicalDevice::Initialize(CEC_DEVICE_TYPE type)
         {
             _primaryState = CEC_READY;
         }
+        else 
+        {
+            _primaryState = CEC_ALLOCATE_LOGICAL_ADDRESS;
+            _logicalAddress = CLA_UNREGISTERED;
+        }
+            
 }
 
 bool CEC_LogicalDevice::ProcessStateMachine(bool* success)
