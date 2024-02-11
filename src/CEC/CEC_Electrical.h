@@ -17,6 +17,7 @@ public:
 
 	int Promiscuous;
 	int MonitorMode;
+	int RawMode;
 
 protected:
 	virtual bool LineState() = 0;

@@ -20,7 +20,7 @@ public:
 	void Initialize(CEC_DEVICE_TYPE type);
 
 	virtual void Run();
-	virtual bool TransmitFrame(int targetAddress, unsigned char* buffer, int count);
+	virtual bool TransmitFrame(int targetAddress, unsigned char* buffer, int count, int sourceAddress=-1);
     
     void setPhysicalAddress(int physicalAddress) {
         _physicalAddress = physicalAddress;

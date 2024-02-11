@@ -30,7 +30,7 @@ void CEC_LogicalDevice::Initialize(CEC_DEVICE_TYPE type)
 	CEC_Electrical::Initialize();
 	_deviceType = type;
 
-        if (MonitorMode)
+        if (MonitorMode || RawMode)
         {
             _primaryState = CEC_READY;
         }
@@ -116,15 +116,15 @@ void CEC_LogicalDevice::OnReceiveComplete(unsigned char* buffer, int count)
 	OnReceive(sourceAddress, targetAddress, buffer + 1, count - 1);
 }
 
-bool CEC_LogicalDevice::TransmitFrame(int targetAddress, unsigned char* buffer, int count)
+bool CEC_LogicalDevice::TransmitFrame(int targetAddress, unsigned char* buffer, int count, int sourceAddress)
 {
 	if (_primaryState != CEC_IDLE)
 		return false;
 
 	unsigned char addr[1];
 
-	addr[0] = MAKE_ADDRESS(_logicalAddress, targetAddress);
-        ClearTransmitBuffer();
+	addr[0] = MAKE_ADDRESS(sourceAddress < 0 ? _logicalAddress : sourceAddress, targetAddress);
+    ClearTransmitBuffer();
 	if (!TransmitPartial(addr, 1))
 		return false;
 	return Transmit(buffer, count);

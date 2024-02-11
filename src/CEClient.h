@@ -16,6 +16,7 @@ public:
     int getLogicalAddress();
     void setPromiscuous(bool promiscuous);
     void setMonitorMode(bool monitorMode);
+	void setRawMode(bool rawMode);
     void onTransmitCompleteCallback(OnTransmitCompleteCallbackFunction);
     void onReceiveCallback(OnReceiveCallbackFunction);
     void run();

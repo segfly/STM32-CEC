@@ -4,6 +4,7 @@ CEC_Electrical::CEC_Electrical(int address)
 {
 	MonitorMode = false;
 	Promiscuous = false;
+	RawMode = false;
 
 	_address = address & 0x0f;
 	_amLastTransmittor = false;
@@ -243,7 +244,7 @@ unsigned long CEC_Electrical::Process()
 
 					// Check to see if the frame is addressed to us
 					// or if we are in promiscuous mode (in which case we'll receive everything)
-					if (!CheckAddress() && !Promiscuous)
+					if (!RawMode && !CheckAddress() && !Promiscuous)
 					{
 						// It's not addressed to us.  Reset and wait for the next start bit
                 			        waitTime = ResetState() ? micros() : (unsigned long)-1;
@@ -251,7 +252,7 @@ unsigned long CEC_Electrical::Process()
 					}
 
 					// If we're the follower, go low for a while
-					if (_follower)
+					if (!RawMode && _follower)
 					{
 						Lower();
 

@@ -43,6 +43,12 @@ void CEClient::setMonitorMode(bool monitorMode) {
     MonitorMode = monitorMode;
 }
 
+// enable-disable raw mode
+void CEClient::setRawMode(bool rawMode) {
+
+    RawMode = rawMode;
+}
+
 // set callback function when a transmit is complete
 void CEClient::onTransmitCompleteCallback(OnTransmitCompleteCallbackFunction callback) {
 
@@ -76,13 +82,16 @@ void CEClient::OnTransmitComplete(bool success) {
 // OnReceive redefinition, if a callback function is available, call it
 // if not, call the parent function
 void CEClient::OnReceive(int source, int dest, unsigned char* buffer, int count) {
+	if ((MonitorMode || RawMode) && buffer[0] == 0x84 && buffer[1] == _physicalAddress >> 8 && buffer[2] == (_physicalAddress & 0xFF)) {
+	  _logicalAddress = source;
+	}
 
     if(_onReceiveCallback)
         _onReceiveCallback(source, dest, buffer, count);        
     else
         CEC_Device::OnReceive(source, dest, buffer, count);
     
-    if (!MonitorMode && dest == _logicalAddress && count == 1 && buffer[0] == 0x83) {
+    if (!MonitorMode && !RawMode && dest == _logicalAddress && count == 1 && buffer[0] == 0x83) {
       unsigned char buffer[4];
       buffer[0] = 0x84;
       buffer[1] = _physicalAddress >> 8;
@@ -91,6 +100,7 @@ void CEClient::OnReceive(int source, int dest, unsigned char* buffer, int count)
       TransmitFrame(0xF, buffer, 4);
     }  
 }
+
 
 // OnReady redefinition, to save the current status
 void CEClient::OnReady() {
