@@ -12,11 +12,11 @@ public:
     CEClient(int physicalAddress, int inputPin, int outputPin=-1);
     void begin(CEC_DEVICE_TYPE type = CEC_LogicalDevice::CDT_PLAYBACK_DEVICE);
     bool isReady();
-    bool write(int targetAddress, unsigned char* buffer, int count);
+    bool write(int targetAddress, unsigned char* buffer, int count, int source=-1);
     int getLogicalAddress();
     void setPromiscuous(bool promiscuous);
     void setMonitorMode(bool monitorMode);
-	void setRawMode(bool rawMode);
+	void setMonitorModeWriting(bool writing);
     void onTransmitCompleteCallback(OnTransmitCompleteCallbackFunction);
     void onReceiveCallback(OnReceiveCallbackFunction);
     void run();

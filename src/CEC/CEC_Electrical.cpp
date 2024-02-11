@@ -4,7 +4,6 @@ CEC_Electrical::CEC_Electrical(int address)
 {
 	MonitorMode = false;
 	Promiscuous = false;
-	RawMode = false;
 
 	_address = address & 0x0f;
 	_amLastTransmittor = false;
@@ -26,7 +25,7 @@ void CEC_Electrical::SetAddress(int address)
 
 bool CEC_Electrical::Raise()
 {
-	if (MonitorMode)
+	if (MonitorMode && !MonitorModeWriting)
 		return LineState();
 
 	unsigned long time = micros();
@@ -43,7 +42,7 @@ bool CEC_Electrical::Raise()
 
 bool CEC_Electrical::Lower()
 {
-	if (MonitorMode)
+	if (MonitorMode && !MonitorModeWriting)
 		return LineState();
 
 	unsigned long time = micros();
@@ -116,7 +115,7 @@ unsigned long CEC_Electrical::LineError()
 	if (_follower || _broadcast)
 	{
 		_secondaryState = CEC_RCV_LINEERROR;
-		Lower();
+		if (!MonitorMode) Lower();
 		return micros() + 3600;
 	}
 	return ResetState() ? micros() : (unsigned long)-1;
@@ -244,7 +243,7 @@ unsigned long CEC_Electrical::Process()
 
 					// Check to see if the frame is addressed to us
 					// or if we are in promiscuous mode (in which case we'll receive everything)
-					if (!RawMode && !CheckAddress() && !Promiscuous)
+					if (!CheckAddress() && !Promiscuous)
 					{
 						// It's not addressed to us.  Reset and wait for the next start bit
                 			        waitTime = ResetState() ? micros() : (unsigned long)-1;
@@ -252,9 +251,9 @@ unsigned long CEC_Electrical::Process()
 					}
 
 					// If we're the follower, go low for a while
-					if (!RawMode && _follower)
+					if (_follower)
 					{
-						Lower();
+						if (!MonitorMode) Lower();
 
 						_secondaryState = CEC_RCV_ACK_SENT;
 						waitTime = _bitStartTime + 1500;
@@ -462,7 +461,7 @@ unsigned long CEC_Electrical::Process()
 
 		case CEC_XMIT_STARTBIT2:
 		case CEC_XMIT_ACK3:
-			Lower();
+			if (!MonitorMode || MonitorModeWriting || _secondaryState == CEC_XMIT_STARTBIT2) Lower();
 
 			_secondaryState = CEC_XMIT_DATABIT1;
 			_tertiaryState = CEC_XMIT_BIT0;
@@ -540,7 +539,7 @@ unsigned long CEC_Electrical::Process()
 			break;
 
 		case CEC_XMIT_ACK:
-			Lower();
+			if (!MonitorMode || MonitorModeWriting) Lower(); 
 
 			// We transmit a '1'
 			//DbgPrint("%p: Sending ack\n", this);
@@ -657,7 +656,7 @@ void CEC_Electrical::ProcessFrame()
 
 void CEC_Electrical::OnTransmitBegin()
 {
-	if (!MonitorMode)
+	if (!MonitorMode || MonitorModeWriting)
 	{
 		if (_primaryState == CEC_IDLE)
 		{

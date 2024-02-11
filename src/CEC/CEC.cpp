@@ -1,4 +1,5 @@
 #include "CEC.h"
+#include <USBComposite.h>
 
 int CEC_LogicalDevice::_validLogicalAddresses[6][5] = 
 	{	{CLA_TV,					CLA_FREE_USE,			CLA_UNREGISTERED,		CLA_UNREGISTERED,	CLA_UNREGISTERED,	},
@@ -30,7 +31,7 @@ void CEC_LogicalDevice::Initialize(CEC_DEVICE_TYPE type)
 	CEC_Electrical::Initialize();
 	_deviceType = type;
 
-        if (MonitorMode || RawMode)
+        if (MonitorMode)
         {
             _primaryState = CEC_READY;
         }

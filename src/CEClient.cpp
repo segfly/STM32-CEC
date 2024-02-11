@@ -20,9 +20,10 @@ bool CEClient::isReady() {
 }
 
 // write a packet on the bus
-bool CEClient::write(int targetAddress, unsigned char* buffer, int count) {
-
-    return CEC_Device::TransmitFrame(targetAddress, buffer, count);
+bool CEClient::write(int targetAddress, unsigned char* buffer, int count, int source) {
+	if (MonitorMode && !MonitorModeWriting)
+		return false;
+    return CEC_Device::TransmitFrame(targetAddress, buffer, count, source);
 }
 
 // return the logical address
@@ -44,9 +45,9 @@ void CEClient::setMonitorMode(bool monitorMode) {
 }
 
 // enable-disable raw mode
-void CEClient::setRawMode(bool rawMode) {
+void CEClient::setMonitorModeWriting(bool writing) {
 
-    RawMode = rawMode;
+    MonitorModeWriting = writing;
 }
 
 // set callback function when a transmit is complete
@@ -82,7 +83,7 @@ void CEClient::OnTransmitComplete(bool success) {
 // OnReceive redefinition, if a callback function is available, call it
 // if not, call the parent function
 void CEClient::OnReceive(int source, int dest, unsigned char* buffer, int count) {
-	if ((MonitorMode || RawMode) && buffer[0] == 0x84 && buffer[1] == _physicalAddress >> 8 && buffer[2] == (_physicalAddress & 0xFF)) {
+	if (MonitorMode && buffer[0] == 0x84 && buffer[1] == (_physicalAddress >> 8) && buffer[2] == (_physicalAddress & 0xFF)) {
 	  _logicalAddress = source;
 	}
 
@@ -91,7 +92,7 @@ void CEClient::OnReceive(int source, int dest, unsigned char* buffer, int count)
     else
         CEC_Device::OnReceive(source, dest, buffer, count);
     
-    if (!MonitorMode && !RawMode && dest == _logicalAddress && count == 1 && buffer[0] == 0x83) {
+    if (!MonitorMode && dest == _logicalAddress && count == 1 && buffer[0] == 0x83) {
       unsigned char buffer[4];
       buffer[0] = 0x84;
       buffer[1] = _physicalAddress >> 8;
