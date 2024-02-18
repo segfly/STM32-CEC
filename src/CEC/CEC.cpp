@@ -1,5 +1,4 @@
 #include "CEC.h"
-#include <USBComposite.h>
 
 int CEC_LogicalDevice::_validLogicalAddresses[6][5] = 
 	{	{CLA_TV,					CLA_FREE_USE,			CLA_UNREGISTERED,		CLA_UNREGISTERED,	CLA_UNREGISTERED,	},

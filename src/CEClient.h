@@ -29,5 +29,4 @@ private:
     OnReceiveCallbackFunction _onReceiveCallback;
     bool _ready;
 };
-
 #endif // CEClient_H__

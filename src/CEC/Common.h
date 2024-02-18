@@ -5,6 +5,7 @@
 # define STM32
 #endif
 
+#undef SERIAL_DEBUG
 
 #ifdef WIN32
 #include <windows.h>
@@ -25,7 +26,12 @@ extern void delayMicroseconds(unsigned int);
 #include "dwt.h"
 
 #define ASSERT(x) ((void)0)
+#ifdef SERIAL_DEBUG
 void DbgPrint(const char* fmt, ...);
+#else
+#define DbgPrint(...) ((void)0)	
+#endif
+
 #ifndef NULL
 	#define NULL 0
 #endif
@@ -33,7 +39,11 @@ void DbgPrint(const char* fmt, ...);
 #else
 
 #define ASSERT(x) ((void)0)
+#ifdef SERIAL_DEBUG
 void DbgPrint(const char* fmt, ...);
+#else
+#define DbgPrint(...) ((void)0)	
+#endif
 #ifndef NULL
 	#define NULL 0
 #endif

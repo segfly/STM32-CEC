@@ -36,6 +36,7 @@ void DbgPrint(const char* fmt, ...)
 //#include <util/delay.h>
 #include <Arduino.h>
 
+#ifdef SERIAL_DEBUG
 void DbgPrint(const char* fmt, ...)
 {
         char FormatBuffer[128]; 
@@ -51,5 +52,6 @@ void DbgPrint(const char* fmt, ...)
           Serial.print(c);
         }
 }
+#endif
 
 #endif 
