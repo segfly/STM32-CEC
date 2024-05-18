@@ -71,6 +71,29 @@ void ledUpdate(uint32_t ledPin, uint32_t interval) {
   }
 }
 
+// Takes an ASCII hex frame in the format of "XX:YY:ZZ.." and stuffs it into the buffer
+// This function make it easier to play with more complex frames output from cec-o-matic
+// This does no bounds checking, so be careful for buffer overflow
+void stuffFrame(const char* input, unsigned char* buffer, int& count) {
+    count = 0;
+    while (*input) {
+        if (*input >= '0' && *input <= '9') {
+            buffer[count] = (*input - '0') << 4;
+        } else {
+            buffer[count] = (*input - 'A' + 10) << 4;
+        }
+        input++;
+        if (*input >= '0' && *input <= '9') {
+            buffer[count] |= (*input - '0');
+        } else {
+            buffer[count] |= (*input - 'A' + 10);
+        }
+        input += 2; // Skip the ':' character
+        count++;
+    }
+}
+
+
 void loop() {
   // run() needs to be executed every loop, as often as possible, because internally it is tracking
   // complex timing on the CEC line
@@ -88,18 +111,16 @@ void loop() {
 
   // For debugging CEC, we only want to transmit once, and only when the client is ready
   if (xmit && ceclient.isReady()) {
+    int count = 0;
+
     if(wakeup) {
       // with broadcast dest, this will wake the TV
-      buffer[0] = 0x04;
-      count = 1;
+      buffer[count++] = 0x04;
     } else {
       // (Broadcast) switch HDMI source to input 3: 4f:82:30:00
       // (Broadcast) switch HDMI source to input 2: 4f:82:20:00
-      dest = 0x0F; // dest set differently here as I was experimenting with targeting devices
-      buffer[0] = 0x82;
-      buffer[1] = 0x30;
-      buffer[2] = 0x00;
-      count = 3;
+      dest = 0x0f; // dest set differently to experiment with different target devices
+      stuffFrame("82:30:00", buffer, count);
     }
 
     // This doesn't actually write the bytes, run() does the work
