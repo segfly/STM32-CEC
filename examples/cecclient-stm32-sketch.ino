@@ -73,10 +73,10 @@ void ledUpdate(uint32_t ledPin, uint32_t interval) {
 
 // Takes an ASCII hex frame in the format of "XX:YY:ZZ.." and stuffs it into the buffer
 // This function make it easier to play with more complex frames output from cec-o-matic
-// This does no bounds checking, so be careful for buffer overflow
-void stuffFrame(const char* input, unsigned char* buffer, int& count) {
+// Stops at end of null-terminated input string, and maxBufferSize
+void stuffFrame(const char* input, unsigned char* buffer, int& count, int maxBufferSize) {
     count = 0;
-    while (*input) {
+    while (*input && count < maxBufferSize) {
         if (*input >= '0' && *input <= '9') {
             buffer[count] = (*input - '0') << 4;
         } else {
@@ -114,13 +114,15 @@ void loop() {
     int count = 0;
 
     if(wakeup) {
-      // with broadcast dest, this will wake the TV
-      buffer[count++] = 0x04;
+      // (Broadcast) 0x04 will wake the TV
+      // (Broadcast) 0x0d will wake and should also clear any text on screen
+      // (Broadcast) 0x36 will sleep system
+      buffer[count++] = 0x0d;
     } else {
       // (Broadcast) switch HDMI source to input 3: 4f:82:30:00
       // (Broadcast) switch HDMI source to input 2: 4f:82:20:00
-      dest = 0x0f; // dest set differently to experiment with different target devices
-      stuffFrame("82:30:00", buffer, count);
+      dest = 0x00; // dest set differently to experiment with different target devices
+      stuffFrame("82:30:00", buffer, count, BUFFER_SIZE);
     }
 
     // This doesn't actually write the bytes, run() does the work
