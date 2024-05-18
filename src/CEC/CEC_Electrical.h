@@ -1,6 +1,7 @@
 #ifndef CECWIRE_H__
 #define CECWIRE_H__
 
+#include "Arduino.h"
 #include "Serial.h"
 
 #define CEC_MAX_RETRANSMIT 5

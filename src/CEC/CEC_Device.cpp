@@ -1,6 +1,8 @@
 #include "CEC_Device.h"
 #include <Arduino.h>
 
+#define ARDUINO_ARCH_STM32F1
+
 #if defined(ARDUINO_ARCH_STM32F1) || defined(ARDUINO_ARCH_STM32F2) || defined(ARDUINO_ARCH_STM32F3) || defined(ARDUINO_ARCH_STM32F4)
 # define STM32
 # define CEC_HIGH 1
@@ -22,7 +24,8 @@ CEC_Device::CEC_Device(int physicalAddress, int in_line, int out_line)
 void CEC_Device::Initialize(CEC_DEVICE_TYPE type)
 {
 #ifdef STM32
-  gpio_set_mode(digitalPinToPort(_in_line), PIN_MAP[_in_line].gpio_bit, GPIO_OUTPUT_OD); // set open drain output
+  //gpio_set_mode(digitalPinToPort(_in_line), PIN_MAP[_in_line].gpio_bit, GPIO_OUTPUT_OD); // set open drain output
+  pinMode(_in_line, OUTPUT_OPEN_DRAIN);
   _out_line = _in_line;
 #else
   pinMode(_out_line, OUTPUT);

@@ -1,6 +1,8 @@
 #ifndef COMMON_H__
 #define COMMON_H__
 
+#define ARDUINO_ARCH_STM32F1
+
 #if defined(ARDUINO_ARCH_STM32F1) || defined(ARDUINO_ARCH_STM32F2) || defined(ARDUINO_ARCH_STM32F3) || defined(ARDUINO_ARCH_STM32F4)
 # define STM32
 #endif
@@ -49,11 +51,11 @@ void DbgPrint(const char* fmt, ...);
 #endif
 
 
-extern "C"
-{
-extern unsigned long micros();
-extern void delayMicroseconds(unsigned int);
-}
+// extern "C"
+// {
+// extern unsigned long micros();
+// extern void delayMicroseconds(unsigned int);
+// }
 
 #endif
 
